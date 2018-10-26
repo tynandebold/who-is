@@ -59,6 +59,7 @@ app.post('/', (req, res) => {
         const location = atlasRes.body[0].result[0].contactDetails.optionAttributes[0].option.name;
         const fields = atlasRes.body[0].result[0].contactDetails.valueAttributes
           .filter(item => item.value !== undefined)
+          .filter(item => item.label !== "Company Email")
           .map(item => {
             return {
               title: item.label,
@@ -67,14 +68,24 @@ app.post('/', (req, res) => {
             }
           });
 
+        fields.unshift({
+          title: 'Location',
+          value: location,
+          short: true
+        });
+
+        const email = atlasRes.body[0].result[0].contactDetails.valueAttributes
+          .filter(item => item.label === "Company Email")
+          .map(item => item.value);
+
         res.status(200).send({
           "attachments": [
             {
-              "color": "#00b0ff",
+              "color": "#cccccc",
               "pretext": `You searched for *${req.body.text}*. Here's what we found:`,
               "title": name,
               "title_link": `https://fs-3566--fhcm2.eu17.visual.force.com/apex/CollaborationPortalIndex?id=a1H1v000003ImcqEAC#/teammember/${id}/org-chart`,
-              "text": `${jobTitle}\n${location}`,
+              "text": `_${jobTitle}_\n${email}`,
               fields,
               "thumb_url": pictureUrl
             }
