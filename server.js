@@ -18,8 +18,6 @@ app.get('/_health', (req, res) => {
 });
 
 app.post('/', (req, res) => {
-  console.log('\n\n INCOMING SLACK PAYLOAD \n\n', req.body, '\n\n');
-
   if (req.body.text === '') {
     res.status(200).send({
       "text": "Please enter a colleague's first or last name (or both).",
@@ -30,7 +28,7 @@ app.post('/', (req, res) => {
   request
     .post('https://fs-3566--fhcm2.eu17.visual.force.com/apexremote')
     .set({
-      'Cookie': 'BrowserId=DSB2FNsDThm324d7pmNw3g; inst=APP_1v; sid_Client=v000004rkdLY000000qrJ4; clientSrc=109.70.48.99; sid=00D0Y000000qrJ4!ARgAQPZmJjWj9wL3FoHgW3lsBbzqyc0aXo7WCA_9GIouVr8v9NY.uuT4h9.HYrZwbKMy4Pxn7CYxpQ1zrPQI2eIQdKLm7ObE; sfdc-stream=!zgOUyH0c8gRsgpsgqKcx2+WfY0HezvDg/+MKWy4ifUYC5pLwANgyR0i46U4qfEfADkZrbnnUgDzmVEc=; force-stream=!zgOUyH0c8gRsgpsgqKcx2+WfY0HezvDg/+MKWy4ifUYC5pLwANgyR0i46U4qfEfADkZrbnnUgDzmVEc=',
+      'Cookie': 'BrowserId=DSB2FNsDThm324d7pmNw3g; inst=APP_1v; sid_Client=v000004rkdLY000000qrJ4; sid=00D0Y000000qrJ4!ARgAQNWDy2GLUT661pX2RX7h.X0L2uUYy4jVoKl_TwKvVC1Ib5OOnCiJomMooscwW4qXxFlzwdBSEbBwpvbNxrC5GCQbMrly; clientSrc=5.56.144.196; sfdc-stream=!wlumGiTGWhZQgjYfOz7qOvAIicC7cisKSk4EksJTt49V7KAX3ASiqzIDP9zdYJC3WXzTUpMobcXSofU=; force-stream=!wlumGiTGWhZQgjYfOz7qOvAIicC7cisKSk4EksJTt49V7KAX3ASiqzIDP9zdYJC3WXzTUpMobcXSofU=',
       'Host': 'fs-3566--fhcm2.eu17.visual.force.com',
       'Origin': 'https://fs-3566--fhcm2.eu17.visual.force.com',
       'Referer': 'https://fs-3566--fhcm2.eu17.visual.force.com/apex/CollaborationPortalIndex?id=a1H1v000003ImcqEAC'
@@ -42,15 +40,13 @@ app.post('/', (req, res) => {
       'type': 'rpc',
       'tid': 10,
       'ctx': {
-        'csrf': 'VmpFPSxNakF4T0MweE1DMHlPRlF3T0RveE9Ub3pNQzQyTlRCYSxBY3FtTGhQalJYOHIyaHJ2VVZId3NlLE56Qm1OekE1',
+        'csrf': 'VmpFPSxNakF4T0MweE1DMHlPVlF3Tnpvek5Ub3hNQzQwTWpaYSx0VC1KVDIzdm9jMVNhLWhpRmY0S3lNLE56Qm1OekE1',
         'vid': '0660Y000002Qb9e',
         'ns': 'fHCM2',
         'ver': 29
       }
     })
     .then(atlasRes => {
-      console.log('\n\n RESPONSE FROM ATLAS \n\n' + JSON.stringify(atlasRes.body, null, 2));
-
       if (atlasRes.body[0].result.length === 0) {
         res.status(200).send({
           "text": "We're sorry, we couldn't find anyone by that name. Please try someone else.",
@@ -74,7 +70,7 @@ app.post('/', (req, res) => {
         res.status(200).send({
           "attachments": [
             {
-              "color": "#cccccc",
+              "color": "#00b0ff",
               "pretext": `You searched for *${req.body.text}*. Here's what we found:`,
               "title": name,
               "title_link": `https://fs-3566--fhcm2.eu17.visual.force.com/apex/CollaborationPortalIndex?id=a1H1v000003ImcqEAC#/teammember/${id}/org-chart`,
@@ -101,6 +97,14 @@ app.post('/', (req, res) => {
         });
         return;
       }      
+    })
+    .catch(err => {
+      if (err) {
+        res.status(200).send({
+          "text": "We're sorry, this service is unavailable right now. Please try again later.",
+        });
+        return;
+      }
     });
 });
 
