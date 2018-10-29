@@ -28,7 +28,7 @@ app.post('/', (req, res) => {
   request
     .post('https://fs-3566--fhcm2.eu17.visual.force.com/apexremote')
     .set({
-      'Cookie': 'BrowserId=DSB2FNsDThm324d7pmNw3g; inst=APP_1v; sid_Client=v000004rkdLY000000qrJ4; sid=00D0Y000000qrJ4!ARgAQNWDy2GLUT661pX2RX7h.X0L2uUYy4jVoKl_TwKvVC1Ib5OOnCiJomMooscwW4qXxFlzwdBSEbBwpvbNxrC5GCQbMrly; clientSrc=5.56.144.196; sfdc-stream=!wlumGiTGWhZQgjYfOz7qOvAIicC7cisKSk4EksJTt49V7KAX3ASiqzIDP9zdYJC3WXzTUpMobcXSofU=; force-stream=!wlumGiTGWhZQgjYfOz7qOvAIicC7cisKSk4EksJTt49V7KAX3ASiqzIDP9zdYJC3WXzTUpMobcXSofU=',
+      'Cookie': 'BrowserId=DSB2FNsDThm324d7pmNw3g; inst=APP_1v; sid_Client=v000004rkdLY000000qrJ4; clientSrc=5.56.144.196; sid=00D0Y000000qrJ4!ARgAQOwUXqj1fxUltdg3NMrq82AuZ3GhpNzIj5sfMVT.Men4AE89l5.Jwxv7poZn34TC7clJ7P_XK_uIbunK2vxd.cSF5W0g; sfdc-stream=!0jUov2omRCgb3CsfOz7qOvAIicC7cgrw8ROi/INofq2hZ377UjVgJx4XMC3wLV3DRSP3WNJ31GDOBu0=; force-stream=!0jUov2omRCgb3CsfOz7qOvAIicC7cgrw8ROi/INofq2hZ377UjVgJx4XMC3wLV3DRSP3WNJ31GDOBu0=',
       'Host': 'fs-3566--fhcm2.eu17.visual.force.com',
       'Origin': 'https://fs-3566--fhcm2.eu17.visual.force.com',
       'Referer': 'https://fs-3566--fhcm2.eu17.visual.force.com/apex/CollaborationPortalIndex?id=a1H1v000003ImcqEAC'
@@ -40,7 +40,7 @@ app.post('/', (req, res) => {
       'type': 'rpc',
       'tid': 10,
       'ctx': {
-        'csrf': 'VmpFPSxNakF4T0MweE1DMHlPVlF3Tnpvek5Ub3hNQzQwTWpaYSx0VC1KVDIzdm9jMVNhLWhpRmY0S3lNLE56Qm1OekE1',
+        'csrf': 'VmpFPSxNakF4T0MweE1TMHdNVlF4TWpvME5qbzFNaTQxTmpCYSxtNGtTTVJQalBGRlhEZmE4LXBBZGlOLE56Qm1OekE1',
         'vid': '0660Y000002Qb9e',
         'ns': 'fHCM2',
         'ver': 29
@@ -55,7 +55,7 @@ app.post('/', (req, res) => {
       }
 
       if (atlasRes.body[0].result.length === 1) {
-        const { name, jobTitle, pictureUrl, id } = atlasRes.body[0].result[0];
+        const { name, jobTitle, id } = atlasRes.body[0].result[0];
         const location = atlasRes.body[0].result[0].contactDetails.optionAttributes[0].option.name;
         const fields = atlasRes.body[0].result[0].contactDetails.valueAttributes
           .filter(item => item.value !== undefined)
@@ -78,19 +78,25 @@ app.post('/', (req, res) => {
           .filter(item => item.label === "Company Email")
           .map(item => item.value);
 
-        res.status(200).send({
-          "attachments": [
-            {
-              "color": "#cccccc",
-              "pretext": `You searched for *${req.body.text}*. Here's what we found:`,
-              "title": name,
-              "title_link": `https://fs-3566--fhcm2.eu17.visual.force.com/apex/CollaborationPortalIndex?id=a1H1v000003ImcqEAC#/teammember/${id}/org-chart`,
-              "text": `_${jobTitle}_\n${email}`,
-              fields,
-              "thumb_url": pictureUrl
-            }
-          ]
-        });
+        request
+          .get(`https://slack.com/api/users.lookupByEmail?token=xoxp-19815804788-19826517185-462647896545-826223738ee7b84a529c1ea1ba94223c&email=${email}`)
+          .then(data => {
+            const pictureUrl = data.body.user.profile.image_192;
+
+            res.status(200).send({
+              "attachments": [
+                {
+                  "color": "#cccccc",
+                  "pretext": `You searched for *${req.body.text}*. Here's what we found:`,
+                  "title": name,
+                  "title_link": `https://fs-3566--fhcm2.eu17.visual.force.com/apex/CollaborationPortalIndex?id=a1H1v000003ImcqEAC#/teammember/${id}/org-chart`,
+                  "text": `_${jobTitle}_\n${email}`,
+                  fields,
+                  "thumb_url": pictureUrl
+                }
+              ]
+            });
+          });
         return;
       }
 
