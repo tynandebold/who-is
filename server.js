@@ -1,5 +1,6 @@
 'use strict';
 
+require('dotenv').config();
 const express = require('express');
 const request = require('superagent');
 const bodyParser = require('body-parser');
@@ -79,7 +80,7 @@ app.post('/', (req, res) => {
           .map(item => item.value);
 
         request
-          .get(`https://slack.com/api/users.lookupByEmail?token=xoxp-19815804788-19826517185-462647896545-826223738ee7b84a529c1ea1ba94223c&email=${email}`)
+          .get(`https://slack.com/api/users.lookupByEmail?token=${process.env.SLACK_TOKEN}&email=thdebold@gmail.com`)
           .then(data => {
             const pictureUrl = data.body.user.profile.image_192;
 
