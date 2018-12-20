@@ -21,6 +21,14 @@ app.get('/_health', (req, res) => {
   });
 });
 
+app.post('/upload', (req, res) => {
+  setTimeout(() => {
+    res.send({
+      ok: true,
+      text: "Text here."
+    })}, 2500);
+});
+
 app.post('/', (req, res) => {
   if (req.body.text === '') {
     res.status(200).send({
@@ -32,7 +40,7 @@ app.post('/', (req, res) => {
   request
     .post('https://fs-3566--fhcm2.eu17.visual.force.com/apexremote')
     .set({
-      'Cookie': 'BrowserId=DSB2FNsDThm324d7pmNw3g; inst=APP_1v; sid_Client=v000004rkdLY000000qrJ4; sid=00D0Y000000qrJ4!ARgAQEIVU43UTjtAVOxxPd33XJNiJQYtUYTz50Nc0jzNN89._KnDZMRyLJ4zTYUnpwDi7Oi8ymXCwqBBVLlP9l4v53SoYaeN; clientSrc=109.70.48.99; sfdc-stream=!IC544pckI8FdcDwfOz7qOvAIicC7cr7XBKfjssp4CiQXP4FClyTN1h1ceZEp0a+5A4qtDt5HDFXGQqU=; force-stream=!IC544pckI8FdcDwfOz7qOvAIicC7cr7XBKfjssp4CiQXP4FClyTN1h1ceZEp0a+5A4qtDt5HDFXGQqU=',
+      'Cookie': 'BrowserId=ukYxcWHfQvG5Pqsaa5vx0w; inst=APP_1v; sid=00D0Y000000qrJ4!ARgAQDMbYtGCLnmXMWLCZTVJy5Xvd49xhRnL5HtbsKZj9ezCpQxWc6ruHgvD1S.90jaqHIUMlSxpFQjBWmjmhGyeUH5_Kz9N; sid_Client=v000004rkdLY000000qrJ4; clientSrc=5.56.144.196; sfdc-stream=!Qkp9R2dTdvEoXYNha0U+1R0Kv+cTthNSjlHLY/m4BF1uUVI7oyr7IkFVkFXX70wqKeLc3SZ+7Vbn/T4=',
       'Host': 'fs-3566--fhcm2.eu17.visual.force.com',
       'Origin': 'https://fs-3566--fhcm2.eu17.visual.force.com',
       'Referer': 'https://fs-3566--fhcm2.eu17.visual.force.com/apex/CollaborationPortalIndex?id=a1H1v000003ImcqEAC'
@@ -44,7 +52,7 @@ app.post('/', (req, res) => {
       'type': 'rpc',
       'tid': 10,
       'ctx': {
-        'csrf': 'VmpFPSxNakF4T0MweE1TMHdNbFF4TXpveU5qbzFNQzQwTWpWYSx1OFdnVzdPNE5sY3NrLTJkdkh5eDZsLE56Qm1OekE1',
+        'csrf': 'VmpFPSxNakF4T0MweE1pMHlNMVF4TmpvMU1Ub3hNaTR5TlRaYSxpZnU5SC1pWWRaVUNSVUVKeklQbERyLE56Qm1OekE1',
         'vid': '0660Y000002Qb9e',
         'ns': 'fHCM2',
         'ver': 29
