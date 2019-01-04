@@ -42,24 +42,27 @@ app.post('/', (req, res) => {
     .get(`https://sheets.googleapis.com/v4/spreadsheets/1OPDkzlWmSTow8-nI6eL7BHximMdDn6TSXPAb7aKpXvg/values/Master-PeopleList!A1:G?key=${process.env.GOOGLE_API_KEY}`)
     .then(googRes => {
       const values = googRes.body.values;      
+      const regex = new RegExp(req.body.text, 'i');
 
       let result = [];
-      const regex = new RegExp(req.body.text, 'i');
       for (let i = 0; i < values.length; i++) {
         let person = {};
+
+        // if the searched name matches a person in the google sheet,
+        // build and object of that person's data
         if (regex.test(values[i][0])) {
           values[0].forEach((value, j) => person[value] = values[i][j])
           result.push(person);
         }
       }
       
-      // if (googRes.body[0].result.length === 0) {
-      //   returnNone(res);
-      // }
+      if (result.length === 0) {
+        returnNone(res);
+      }
 
-      // if (googRes.body[0].result.length === 1) {
-      //   returnOne(req, res, googRes);
-      // }
+      if (result.length === 1) {
+        returnOne(req, res, result);
+      }
 
       if (result.length > 1) {
         returnMultiple(req, res, result);

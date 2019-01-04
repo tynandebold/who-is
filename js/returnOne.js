@@ -1,28 +1,23 @@
 const request = require('superagent');
 
-module.exports = (req, slackRes, atlasRes) => {
-  const { name, jobTitle, id } = atlasRes.body[0].result[0];
-  const location = atlasRes.body[0].result[0].contactDetails.optionAttributes[0].option.name;
-  const fields = atlasRes.body[0].result[0].contactDetails.valueAttributes
-    .filter(item => item.value !== undefined)
-    .filter(item => item.label !== "Company Email")
-    .map(item => {
-      return {
-        title: item.label,
-        value: item.value,
-        short: true
-      }
+module.exports = (req, slackRes, result) => {
+  const name = result[0]['Team Member: Full Name'];
+  const jobTitle = result[0].Role;
+  const email = result[0]['Company Email'];
+
+  let fields = [];
+  for (const key of Object.keys(result[0])) {
+    fields.push({
+      title: key,
+      value: result[0][key],
+      short: true
     });
+  }
 
-  fields.unshift({
-    title: 'Location',
-    value: location,
-    short: true
-  });
-
-  const email = atlasRes.body[0].result[0].contactDetails.valueAttributes
-    .filter(item => item.label === "Company Email")
-    .map(item => item.value);
+  fields = fields
+    .filter(field => field.title !== 'Team Member: Full Name')
+    .filter(field => field.title !== 'Company Email')
+    .filter(field => field.title !== 'Role');
 
   request
     .get(`https://slack.com/api/users.lookupByEmail?token=${process.env.SLACK_TOKEN}&email=dov@dovfriedman.com`)
@@ -35,7 +30,6 @@ module.exports = (req, slackRes, atlasRes) => {
             "color": "#cccccc",
             "pretext": `You searched for *${req.body.text}*. Here's what we found:`,
             "title": name,
-            "title_link": `https://fs-3566--fhcm2.eu17.visual.force.com/apex/CollaborationPortalIndex?id=a1H1v000003ImcqEAC#/teammember/${id}/org-chart`,
             "text": `_${jobTitle}_\n${email}`,
             fields,
             "thumb_url": pictureUrl
