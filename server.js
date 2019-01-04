@@ -26,7 +26,8 @@ app.post('/upload', (req, res) => {
     res.send({
       ok: true,
       text: "Text here."
-    })}, 2500);
+    })
+  }, 2500);
 });
 
 app.post('/', (req, res) => {
@@ -38,37 +39,30 @@ app.post('/', (req, res) => {
   }
 
   request
-    .post('https://fs-3566--fhcm2.eu17.visual.force.com/apexremote')
-    .set({
-      'Cookie': 'BrowserId=ukYxcWHfQvG5Pqsaa5vx0w; inst=APP_1v; sid=00D0Y000000qrJ4!ARgAQDMbYtGCLnmXMWLCZTVJy5Xvd49xhRnL5HtbsKZj9ezCpQxWc6ruHgvD1S.90jaqHIUMlSxpFQjBWmjmhGyeUH5_Kz9N; sid_Client=v000004rkdLY000000qrJ4; clientSrc=5.56.144.196; sfdc-stream=!Qkp9R2dTdvEoXYNha0U+1R0Kv+cTthNSjlHLY/m4BF1uUVI7oyr7IkFVkFXX70wqKeLc3SZ+7Vbn/T4=',
-      'Host': 'fs-3566--fhcm2.eu17.visual.force.com',
-      'Origin': 'https://fs-3566--fhcm2.eu17.visual.force.com',
-      'Referer': 'https://fs-3566--fhcm2.eu17.visual.force.com/apex/CollaborationPortalIndex?id=a1H1v000003ImcqEAC'
-    })
-    .send({
-      'action': 'fHCM2.CollaborationPortalRAController',
-      'method': 'getContacts',
-      'data': [req.body.text, ''],
-      'type': 'rpc',
-      'tid': 10,
-      'ctx': {
-        'csrf': 'VmpFPSxNakF4T0MweE1pMHlNMVF4TmpvMU1Ub3hNaTR5TlRaYSxpZnU5SC1pWWRaVUNSVUVKeklQbERyLE56Qm1OekE1',
-        'vid': '0660Y000002Qb9e',
-        'ns': 'fHCM2',
-        'ver': 29
-      }
-    })
-    .then(atlasRes => {
-      if (atlasRes.body[0].result.length === 0) {
-        returnNone(res);
-      }
+    .get(`https://sheets.googleapis.com/v4/spreadsheets/1OPDkzlWmSTow8-nI6eL7BHximMdDn6TSXPAb7aKpXvg/values/Master-PeopleList!A1:G?key=${process.env.GOOGLE_API_KEY}`)
+    .then(googRes => {
+      const values = googRes.body.values;      
 
-      if (atlasRes.body[0].result.length === 1) {
-        returnOne(req, res, atlasRes);
+      let result = [];
+      const regex = new RegExp(req.body.text, 'i');
+      for (let i = 0; i < values.length; i++) {
+        let person = {};
+        if (regex.test(values[i][0])) {
+          values[0].forEach((value, j) => person[value] = values[i][j])
+          result.push(person);
+        }
       }
+      
+      // if (googRes.body[0].result.length === 0) {
+      //   returnNone(res);
+      // }
 
-      if (atlasRes.body[0].result.length > 1) {
-        returnMultiple(req, res, atlasRes);
+      // if (googRes.body[0].result.length === 1) {
+      //   returnOne(req, res, googRes);
+      // }
+
+      if (result.length > 1) {
+        returnMultiple(req, res, result);
       }
     })
     .catch(err => {

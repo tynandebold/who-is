@@ -1,5 +1,5 @@
-module.exports = (req, slackRes, result) => {
-  const multipleResults = result.map(person => person['Team Member: Full Name']).join('\n');
+module.exports = (req, slackRes, atlasRes) => {
+  const multipleResults = atlasRes.body[0].result.map(person => person.name).join('\n');
 
   slackRes.status(200).send({
     "attachments": [
