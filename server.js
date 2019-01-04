@@ -39,7 +39,7 @@ app.post('/', (req, res) => {
   }
 
   request
-    .get(`https://sheets.googleapis.com/v4/spreadsheets/1OPDkzlWmSTow8-nI6eL7BHximMdDn6TSXPAb7aKpXvg/values/Master-PeopleList!A1:G?key=${process.env.GOOGLE_API_KEY}`)
+    .get(`https://sheets.googleapis.com/v4/spreadsheets/1OPDkzlWmSTow8-nI6eL7BHximMdDn6TSXPAb7aKpXvg/values/Master-PeopleList!A1:H?key=${process.env.GOOGLE_API_KEY}`)
     .then(googRes => {
       const values = googRes.body.values;      
       const regex = new RegExp(req.body.text, 'i');

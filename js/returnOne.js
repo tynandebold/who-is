@@ -8,7 +8,7 @@ module.exports = (req, slackRes, result) => {
   let fields = [];
   for (const key of Object.keys(result[0])) {
     fields.push({
-      title: key,
+      title: key === 'People Manager' ? 'Manager' : key,
       value: result[0][key],
       short: true
     });
