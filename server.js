@@ -3,7 +3,9 @@
 require('dotenv').config();
 const express = require('express');
 const request = require('superagent');
+const { google } = require('googleapis');
 const bodyParser = require('body-parser');
+
 const returnOne = require('./js/returnOne');
 const returnNone = require('./js/returnNone');
 const returnMultiple = require('./js/returnMultiple');
@@ -38,44 +40,62 @@ app.post('/', (req, res) => {
     return;
   }
 
-  request
-    .get(`https://sheets.googleapis.com/v4/spreadsheets/1OPDkzlWmSTow8-nI6eL7BHximMdDn6TSXPAb7aKpXvg/values/Master-PeopleList!A1:H?key=${process.env.GOOGLE_API_KEY}`)
-    .then(googRes => {
-      const values = googRes.body.values;      
-      const regex = new RegExp(req.body.text, 'i');
+  const googleJWTClient = new google.auth.JWT(
+    process.env.SERVICE_ACCOUNT_EMAIL,
+    null,
+    process.env.SERVICE_ACCOUNT_KEY,
+    ['https://www.googleapis.com/auth/spreadsheets.readonly'],
+    null,
+  );
 
-      let result = [];
-      for (let i = 0; i < values.length; i++) {
-        let person = {};
+  googleJWTClient.authorize((error, tokens) => {
+    if (error) {
+      return console.error('Couldn\'t get access token', e)
+    }   
 
-        // if the searched name matches a person in the google sheet,
-        // build and object of that person's data
-        if (regex.test(values[i][0])) {
-          values[0].forEach((value, j) => person[value] = values[i][j])
-          result.push(person);
+    request
+      .get(`https://sheets.googleapis.com/v4/spreadsheets/10ShdRhDQdGbAKFXO8RMTe9Gpi2DX-QifIRIwBfjlAWw/values/Master-PeopleList!C1:K?access_token=${tokens.access_token}`)
+      .then(googRes => {
+        const values = googRes.body.values;
+        const regex = new RegExp(req.body.text, 'i');
+
+        let result = [];
+        for (let i = 0; i < values.length; i++) {
+          let person = {};
+
+          // if the searched name matches a person in the google sheet,
+          // build and object of that person's data
+          if (regex.test(values[i][0])) {
+            values[0].forEach((value, j) => person[value] = values[i][j])
+            result.push(person);
+          }
         }
-      }
-      
-      if (result.length === 0) {
-        returnNone(res);
-      }
 
-      if (result.length === 1) {
-        returnOne(req, res, result);
-      }
+        if (result.length === 0) {
+          returnNone(res);
+        }
 
-      if (result.length > 1) {
-        returnMultiple(req, res, result);
-      }
-    })
-    .catch(err => {
-      if (err) {
-        res.status(200).send({
-          "text": "We're sorry, this service is unavailable right now. Please try again later.",
-        });
-        return;
-      }
-    });
+        if (result.length === 1) {
+          returnOne(req, res, result);
+        }
+
+        if (result.length > 1) {
+          returnMultiple(req, res, result);
+        }
+      })
+      .catch(err => {
+        console.log(err);
+        
+        if (err) {
+          res.status(200).send({
+            "text": "We're sorry, this service is unavailable right now. Please try again later.",
+          });
+          return;
+        }
+      });
+  });
+
+  
 });
 
 app.listen(port);
