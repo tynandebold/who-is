@@ -1,25 +1,26 @@
 {
-  "name": "starter-server",
+  "name": "who-is-that",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon server.js"
+    "start": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tynandebold/who-is.git"
   },
   "engines": {
     "node": "9.4.0",
     "npm": "5.6.0"
   },
   "keywords": [],
-  "contributors": [
-    {
-      "name": "Tynan DeBold"
-    },
-    {
-      "name": "Dov Friedman"
-    }
-  ],
+  "author": "Tynan DeBold",
   "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tynandebold/who-is/issues"
+  },
+  "homepage": "https://github.com/tynandebold/who-is#readme",
   "dependencies": {
     "body-parser": "^1.18.3",
     "dotenv": "^6.1.0",

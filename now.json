@@ -1,0 +1,22 @@
+{
+  "version": 2,
+  "name": "who-is-that",
+  "builds": [
+    {
+      "src": "index.js",
+      "use": "@now/node-server"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/_health",
+      "dest": "index.js"
+    }
+  ],
+  "env": {
+    "GOOGLE_API_KEY": "@who-is-google-api-key",
+    "SERVICE_ACCOUNT_EMAIL": "@who-is-service-account-email",
+    "SERVICE_ACCOUNT_KEY": "@who-is-service-account-key",
+    "SLACK_TOKEN": "@who-is-slack-token"
+  }
+}

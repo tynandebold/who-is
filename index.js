@@ -23,13 +23,8 @@ app.get('/_health', (req, res) => {
   });
 });
 
-app.post('/upload', (req, res) => {
-  setTimeout(() => {
-    res.send({
-      ok: true,
-      text: "Text here."
-    })
-  }, 2500);
+app.get('/', (req, res) => {
+  res.send('Up and running. Let\'s get some coworker information.');
 });
 
 app.post('/', (req, res) => {
@@ -38,12 +33,12 @@ app.post('/', (req, res) => {
       "text": "Please enter a colleague's first or last name (or both).",
     });
     return;
-  }
+  }  
 
   const googleJWTClient = new google.auth.JWT(
     process.env.SERVICE_ACCOUNT_EMAIL,
     null,
-    process.env.SERVICE_ACCOUNT_KEY,
+    Buffer.from(`${process.env.SERVICE_ACCOUNT_KEY}`, 'base64').toString('ascii'),
     ['https://www.googleapis.com/auth/spreadsheets.readonly'],
     null,
   );
@@ -84,8 +79,6 @@ app.post('/', (req, res) => {
         }
       })
       .catch(err => {
-        console.log(err);
-        
         if (err) {
           res.status(200).send({
             "text": "We're sorry, this service is unavailable right now. Please try again later.",
@@ -94,8 +87,6 @@ app.post('/', (req, res) => {
         }
       });
   });
-
-  
 });
 
 app.listen(port);
