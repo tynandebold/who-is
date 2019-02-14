@@ -33,7 +33,16 @@ app.post('/', (req, res) => {
       "text": "Please enter a colleague's first or last name (or both).",
     });
     return;
-  }  
+  }
+
+  if (req.body.text === 'help') {
+    res.status(200).send({
+      "text": "How to use /find",
+      "attachments": [{
+        "text": "To find useful work-related information about a coworker, search using their first name, last name, or a combination. For example, to find `Tynan DeBold`, you could search using the term `/find Tynan`, `/find debold`, or even `/find tynan DE`.\nAlso, the search isn't case sensitive, so feel free to be reckless there.\nLastly, the respone will only be visible to you, regarless of where you use the command. So you can safely use this in a channel like #general without worrying about if others will see it."
+      }]
+    })
+  }
 
   const googleJWTClient = new google.auth.JWT(
     process.env.SERVICE_ACCOUNT_EMAIL,
@@ -45,8 +54,8 @@ app.post('/', (req, res) => {
 
   googleJWTClient.authorize((error, tokens) => {
     if (error) {
-      return console.error('Couldn\'t get access token', e)
-    }   
+      return console.error('Couldn\'t get access token', e);
+    }
 
     request
       .get(`https://sheets.googleapis.com/v4/spreadsheets/10ShdRhDQdGbAKFXO8RMTe9Gpi2DX-QifIRIwBfjlAWw/values/Master-PeopleList!C1:K?access_token=${tokens.access_token}`)
@@ -58,10 +67,10 @@ app.post('/', (req, res) => {
         for (let i = 0; i < values.length; i++) {
           let person = {};
 
-          // if the searched name matches a person in the google sheet,
-          // build and object of that person's data
+          // If the searched name matches a person in the google sheet,
+          // build an object of that person's data
           if (regex.test(values[i][0])) {
-            values[0].forEach((value, j) => person[value] = values[i][j])
+            values[0].forEach((value, j) => person[value] = values[i][j]);
             result.push(person);
           }
         }
